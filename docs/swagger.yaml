@@ -1,0 +1,45 @@
+definitions:
+  routers.targetEntity:
+    type: object
+info:
+  contact: {}
+paths:
+  /target_graph:
+    get:
+      consumes:
+      - application/json
+      description: 用户关系搜索
+      parameters:
+      - description: 关系
+        in: query
+        name: rel
+        type: string
+      - description: 最小深度
+        in: query
+        name: start
+        type: string
+      - description: 最大深度
+        in: query
+        name: end
+        type: string
+      - description: 字段
+        in: query
+        name: field
+        type: string
+      - description: 关键字
+        in: query
+        name: keyword
+        type: string
+      - description: 分页数量
+        in: query
+        name: limit
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/routers.targetEntity'
+      summary: 用户关系搜索
+swagger: "2.0"

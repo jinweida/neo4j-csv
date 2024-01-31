@@ -1,0 +1,71 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/target_graph": {
+            "get": {
+                "description": "用户关系搜索",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "用户关系搜索",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "关系",
+                        "name": "rel",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "最小深度",
+                        "name": "start",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "最大深度",
+                        "name": "end",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "字段",
+                        "name": "field",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "关键字",
+                        "name": "keyword",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "分页数量",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/routers.targetEntity"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "routers.targetEntity": {
+            "type": "object"
+        }
+    }
+}

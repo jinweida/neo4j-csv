@@ -1,12 +1,13 @@
 package main
 
 import (
-	"flag"
 	"fmt"
-	"strings"
-	"sync"
+	"neo4j-csv/docs"
+	"neo4j-csv/routers"
 
-	"fclink.cn/neo4j-tool/data"
+	"github.com/gin-gonic/gin"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 var (
@@ -15,38 +16,41 @@ var (
 	delete bool
 )
 
-func main() {
-	flag.StringVar(&model, "model", "", "导入类型")
-	flag.StringVar(&dir, "dir", "", "文件")
-	flag.BoolVar(&delete, "delete", false, "导入前是否清理数据")
-	flag.Parse()
-	files := strings.Split(dir, ",")
+// 模拟一些私人数据
+var secrets = gin.H{
+	"foo":    gin.H{"email": "foo@bar.com", "phone": "123433"},
+	"austin": gin.H{"email": "austin@example.com", "phone": "666"},
+	"lena":   gin.H{"email": "lena@guapa.com", "phone": "523443"},
+}
 
-	fmt.Println(files)
-	var wg sync.WaitGroup
-	wg.Add(len(files))
-	for _, file := range files {
-		fmt.Println(file)
-		if strings.HasSuffix(file, ".csv") {
-			go func() {
-				if model == "user" {
-					// 执行任务
-					data.NewImportEntityUser().OpData(file, delete)
-					wg.Done()
-				}
-				if model == "purchased" {
-					// 执行任务
-					data.NewImportRelationshipPurchased().OpData(file, delete)
-					wg.Done()
-				}
-				fmt.Println("用户协程", "执行完毕")
-			}()
-		} else {
-			wg.Done()
-		}
-	}
-	// 等待所有协程执行完毕
-	wg.Wait()
+func main() {
+	docs.SwaggerInfo.Title = "用户360关系"
+	docs.SwaggerInfo.Description = "用户360关系"
+	docs.SwaggerInfo.Version = "1.0"
+	// docs.SwaggerInfo.Host = "localhost:8080"
+	docs.SwaggerInfo.BasePath = "/api"
+	gin.SetMode(gin.DebugMode)
+
+	action := &routers.Graph{}
+	// 禁止日志的颜色
+	// gin.DisableConsoleColor()
+	r := gin.Default()
+	r.GET("/ping", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"message": "pong",
+		})
+	})
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+
+	api := r.Group("/api", gin.BasicAuth(gin.Accounts{
+		"foo":    "bar",
+		"austin": "1234",
+		"lena":   "hello2",
+		"manu":   "4321",
+	}))
+	api.GET("/target_graph", action.Targetgraph)
+	r.Run("0.0.0.0:8080") // 监听并在 0.0.0.0:8080 上启动服务
 
 	fmt.Println("主线程执行完毕")
+
 }
